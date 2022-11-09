@@ -52,9 +52,9 @@
       "APR": "APR",
       "APRIncentivized": "7d vol.",
       "search": "piscinas de búsqueda",
-      "displayLowLiquidity": "Show piscinas <{value}",
+      "displayLowLiquidity": "Mostrar piscinas <{value}",
       "sort": {
-        "poolName": "Nombre de la Pool",
+        "poolName": "Nombre",
         "liquidity": "Liquidez",
         "volume24h": "Volumen (24h)",
         "fees": "Tarifas (7d)",
@@ -69,7 +69,7 @@
       "APR": "APR",
       "search": "Buscar por símbolo",
       "sort": {
-        "poolName": "Nombre de la Pool",
+        "poolName": "Nombre",
         "liquidity": "Liquidez",
         "APR": "APR",
         "epochs": "Épocas restantes",
