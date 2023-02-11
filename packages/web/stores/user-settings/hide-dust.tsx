@@ -1,9 +1,13 @@
-import { action, makeObservable, observable, computed } from "mobx";
+import { action, computed, makeObservable, observable } from "mobx";
 import { FunctionComponent } from "react";
-import { Switch } from "../../components/control";
-import { UserSetting } from ".";
-import { Icon } from "../../components/assets";
 import { useTranslation } from "react-multi-lang";
+
+import { Icon } from "~/components/assets";
+import { Switch } from "~/components/control";
+import { EventName } from "~/config";
+import { useAmplitudeAnalytics } from "~/hooks";
+
+import { UserSetting } from ".";
 
 export type HideDustState = { hideDust: boolean };
 export class HideDustUserSetting implements UserSetting<HideDustState> {
@@ -12,13 +16,17 @@ export class HideDustUserSetting implements UserSetting<HideDustState> {
     hideDust,
   }) => {
     const t = useTranslation();
+    const { logEvent } = useAmplitudeAnalytics();
     return (
       <div className="mt-4 flex flex-col gap-[46px] rounded-2xl border-2 border-osmoverse-700 bg-osmoverse-800 p-6">
         <div className="flex items-center justify-between">
           <Icon id="dust-broom" className="text-osmoverse-200" />
           <Switch
             isOn={hideDust}
-            onToggle={() => this.setState({ hideDust: !hideDust })}
+            onToggle={() => {
+              logEvent([EventName.Settings.hideDustToggle]);
+              this.setState({ hideDust: !hideDust });
+            }}
           />
         </div>
 

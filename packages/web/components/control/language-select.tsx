@@ -4,8 +4,11 @@ import { observer } from "mobx-react-lite";
 import React, { Fragment, FunctionComponent, useEffect } from "react";
 import { useTranslation } from "react-multi-lang";
 
-import { useStore } from "../../stores";
-import { LanguageUserSetting } from "../../stores/user-settings";
+import { EventName } from "~/config";
+import { useAmplitudeAnalytics } from "~/hooks";
+import { useStore } from "~/stores";
+import { LanguageUserSetting } from "~/stores/user-settings";
+
 import { Icon } from "../assets";
 import { Button } from "../buttons";
 import { MenuDropdownIconItemProps } from "./types";
@@ -17,6 +20,7 @@ export type LanguageSelectProps = {
 export const LanguageSelect: FunctionComponent<LanguageSelectProps> = observer(
   (props) => {
     const { options } = props;
+    const { logEvent } = useAmplitudeAnalytics();
 
     const { userSettings } = useStore();
     const languageSetting = userSettings.getUserSettingById(
@@ -28,6 +32,12 @@ export const LanguageSelect: FunctionComponent<LanguageSelectProps> = observer(
     );
 
     const onSelect = (option: MenuDropdownIconItemProps) => {
+      logEvent([
+        EventName.Settings.languageSelect,
+        {
+          language: option.value,
+        },
+      ]);
       languageSetting.setState({ language: option.value });
     };
 
