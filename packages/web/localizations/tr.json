@@ -16,12 +16,6 @@
       "externalLinkModalTitle": "Osmosis'den Ayrılma"
     }
   },
-  "mars": {
-    "banner": {
-      "title": "Osmosis'te Ödünç Alma/Ödünç Verme başladı.",
-      "linkText": "Mars Protocol'ı keşfedin"
-    }
-  },
   "swap": {
     "title": "Takas",
     "settings": {
@@ -285,7 +279,8 @@
         "insufficientFee": "Yetersiz Ücret",
         "insufficientBal": "Yetersiz Bakiye"
       },
-      "wrapNativeLink": "{platformName} üzerinde {fromDenom} dan {fromDenom} a çevir.",
+      "useWrappedDeposit": "Satellite'e {wrapDenom} yatırın",
+      "useWrappedWithdraw": "{wrapDenom}'e Satellite'den çekin",
       "waitTime": "{minutes} dakika"
     },
     "selectAssetSource": {

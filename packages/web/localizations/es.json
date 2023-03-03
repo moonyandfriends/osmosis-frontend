@@ -16,12 +16,6 @@
       "externalLinkModalTitle": "Saliendo de Osmosis"
     }
   },
-  "mars": {
-    "banner": {
-      "title": "Se han lanzado préstamos en Osmosis.",
-      "linkText": "Explora Mars Protocol"
-    }
-  },
   "swap": {
     "title": "Intercambio",
     "settings": {
@@ -285,7 +279,8 @@
         "insufficientFee": "Cuota insuficiente",
         "insufficientBal": "Saldo insuficiente"
       },
-      "wrapNativeLink": "Convertir {fromDenom} a {toDenom} en {platformName}",
+      "useWrappedDeposit": "Deposite {wrapDenom} con Satellite",
+      "useWrappedWithdraw": "Retirar {wrapDenom} con Satellite",
       "waitTime": "{minutes} minutos"
     },
     "selectAssetSource": {
