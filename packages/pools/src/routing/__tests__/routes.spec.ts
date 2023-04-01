@@ -1,9 +1,9 @@
 import { Int } from "@keplr-wallet/unit";
 import deepmerge from "deepmerge";
 
+import { StablePool } from "../../stable";
+import { WeightedPool } from "../../weighted";
 import { OptimizedRoutes } from "../routes";
-import { StablePool } from "../stable";
-import { WeightedPool } from "../weighted";
 
 describe("OptimizedRoutes", () => {
   describe("Simple: picks higher liquidity routes", () => {

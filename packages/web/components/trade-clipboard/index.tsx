@@ -83,14 +83,11 @@ export const TradeClipboard: FunctionComponent<{
     );
 
     const gasForecasted = (() => {
-      if (
-        tradeTokenInConfig.optimizedRoutePaths.length === 0 ||
-        tradeTokenInConfig.optimizedRoutePaths[0].pools.length <= 1
-      ) {
+      if (!tradeTokenInConfig.currentQuotedRoute) {
         return 250000;
       }
 
-      return 250000 * tradeTokenInConfig.optimizedRoutePaths[0].pools.length;
+      return 250000 * tradeTokenInConfig.currentQuotedRoute.pools.length;
     })();
 
     const feeConfig = useFakeFeeConfig(
@@ -109,12 +106,10 @@ export const TradeClipboard: FunctionComponent<{
       (value: boolean) => {
         // refresh current route's pools
         if (value) {
-          tradeTokenInConfig.optimizedRoutePaths.forEach((route) => {
-            route.pools.forEach((pool) => {
-              queries.osmosis?.queryGammPools
-                .getPool(pool.id)
-                ?.waitFreshResponse();
-            });
+          tradeTokenInConfig.currentQuotedRoute?.pools.forEach((pool) => {
+            queries.osmosis?.queryGammPools
+              .getPool(pool.id)
+              ?.waitFreshResponse();
           });
         }
 
@@ -314,7 +309,7 @@ export const TradeClipboard: FunctionComponent<{
       if (account.walletStatus !== WalletStatus.Loaded) {
         return account.init();
       }
-      if (tradeTokenInConfig.optimizedRoutePaths.length > 0) {
+      if (tradeTokenInConfig.currentQuotedRoute) {
         const routePools: {
           poolId: string;
           tokenOutCurrency: Currency;
@@ -322,14 +317,14 @@ export const TradeClipboard: FunctionComponent<{
 
         for (
           let i = 0;
-          i < tradeTokenInConfig.optimizedRoutePaths[0].pools.length;
+          i < tradeTokenInConfig.currentQuotedRoute.pools.length;
           i++
         ) {
-          const pool = tradeTokenInConfig.optimizedRoutePaths[0].pools[i];
+          const pool = tradeTokenInConfig.currentQuotedRoute.pools[i];
           const tokenOutCurrency = chainStore.osmosisObservable.currencies.find(
             (cur) =>
               cur.coinMinimalDenom ===
-              tradeTokenInConfig.optimizedRoutePaths[0].tokenOutDenoms[i]
+              tradeTokenInConfig.currentQuotedRoute!.tokenOutDenoms[i]
           );
 
           if (!tokenOutCurrency) {
@@ -337,7 +332,7 @@ export const TradeClipboard: FunctionComponent<{
               new Error(
                 t("swap.error.findCurrency", {
                   currency:
-                    tradeTokenInConfig.optimizedRoutePaths[0].tokenOutDenoms[i],
+                    tradeTokenInConfig.currentQuotedRoute.tokenOutDenoms[i],
                 })
               )
             );
@@ -353,15 +348,14 @@ export const TradeClipboard: FunctionComponent<{
         const tokenInCurrency = chainStore.osmosisObservable.currencies.find(
           (cur) =>
             cur.coinMinimalDenom ===
-            tradeTokenInConfig.optimizedRoutePaths[0].tokenInDenom
+            tradeTokenInConfig.currentQuotedRoute!.tokenInDenom
         );
 
         if (!tokenInCurrency) {
           tradeTokenInConfig.setError(
             new Error(
               t("swap.error.findCurrency", {
-                currency:
-                  tradeTokenInConfig.optimizedRoutePaths[0].tokenInDenom,
+                currency: tradeTokenInConfig.currentQuotedRoute.tokenInDenom,
               })
             )
           );
@@ -409,7 +403,6 @@ export const TradeClipboard: FunctionComponent<{
                     tokenAmount: Number(tokenIn.amount),
                     toToken: tradeTokenInConfig.outCurrency.coinDenom,
                     isOnHome: !isInModal,
-
                     isMultiHop: false,
                   },
                 ]);
@@ -1079,21 +1072,17 @@ export const TradeClipboard: FunctionComponent<{
                   </span>
                 </div>
               </div>
-              {!isInModal &&
-                tradeTokenInConfig.optimizedRoutePaths
-                  .slice(0, 1)
-                  .map((route, index) => (
-                    <TradeRoute
-                      key={index}
-                      sendCurrency={tradeTokenInConfig.sendCurrency}
-                      outCurrency={tradeTokenInConfig.outCurrency}
-                      route={route}
-                      isMultihopOsmoFeeDiscount={
-                        tradeTokenInConfig.expectedSwapResult
-                          .isMultihopOsmoFeeDiscount
-                      }
-                    />
-                  ))}
+              {!isInModal && tradeTokenInConfig.currentQuotedRoute && (
+                <TradeRoute
+                  sendCurrency={tradeTokenInConfig.sendCurrency}
+                  outCurrency={tradeTokenInConfig.outCurrency}
+                  route={tradeTokenInConfig.currentQuotedRoute}
+                  isMultihopOsmoFeeDiscount={
+                    tradeTokenInConfig.expectedSwapResult
+                      .isMultihopOsmoFeeDiscount
+                  }
+                />
+              )}
             </div>
           </div>
         </div>
@@ -1107,7 +1096,7 @@ export const TradeClipboard: FunctionComponent<{
           disabled={
             account.walletStatus === WalletStatus.Loaded &&
             (tradeTokenInConfig.error !== undefined ||
-              tradeTokenInConfig.optimizedRoutePaths.length === 0 ||
+              tradeTokenInConfig.currentQuotedRoute?.pools.length === 0 ||
               account.txTypeInProgress !== "")
           }
           onClick={swap}

@@ -54,9 +54,8 @@ export function useTradeTokenInConfig(
   // refresh relevant pool data every `requeryIntervalMs` period
   useEffect(() => {
     const interval = setInterval(() => {
-      const poolIds = config.optimizedRoutePaths
-        .map((route) => route.pools.map((pool) => pool.id))
-        .flat();
+      const poolIds =
+        config.currentQuotedRoute?.pools.map((pool) => pool.id).flat() ?? [];
 
       poolIds.forEach((poolId) => {
         queriesStore
@@ -67,7 +66,7 @@ export function useTradeTokenInConfig(
     }, requeryIntervalMs);
     return () => clearInterval(interval);
   }, [
-    config.optimizedRoutePaths,
+    config.currentQuotedRoute,
     osmosisChainId,
     queriesStore,
     requeryIntervalMs,
@@ -77,10 +76,14 @@ export function useTradeTokenInConfig(
     config.setIncentivizedPoolIds(
       queriesOsmosis.queryIncentivizedPools.incentivizedPools
     );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [queriesOsmosis.queryIncentivizedPools.response]);
+  useEffect(() => {
+    config.setPools(pools);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pools]);
 
   config.setChain(osmosisChainId);
   config.setSender(bech32Address);
-  config.setPools(pools);
   return config;
 }

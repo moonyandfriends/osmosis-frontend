@@ -4,8 +4,8 @@ import {
   isOsmoRoutedMultihop,
 } from "@osmosis-labs/math";
 
+import { Pool } from "../interface";
 import { NoPoolsError, NotEnoughLiquidityError } from "./errors";
-import { Pool } from "./interface";
 
 export interface Route {
   pools: Pool[];
@@ -21,6 +21,21 @@ export interface RouteWithAmount extends Route {
   amount: Int;
 }
 
+export type TokenOutByTokenInResult = {
+  amount: Int;
+  beforeSpotPriceInOverOut: Dec;
+  beforeSpotPriceOutOverIn: Dec;
+  afterSpotPriceInOverOut: Dec;
+  afterSpotPriceOutOverIn: Dec;
+  effectivePriceInOverOut: Dec;
+  effectivePriceOutOverIn: Dec;
+  tokenInFeeAmount: Int;
+  swapFee: Dec;
+  multiHopOsmoDiscount: boolean;
+  priceImpact: Dec;
+};
+
+/** Generates cached routes through a give set of static pools. */
 export class OptimizedRoutes {
   protected _pools: ReadonlyArray<Pool>;
   protected _incentivizedPoolIds: string[];
@@ -37,6 +52,10 @@ export class OptimizedRoutes {
 
   get pools(): ReadonlyArray<Pool> {
     return this._pools;
+  }
+
+  setIncentivizedPoolIds(poolIds: string[]) {
+    this._incentivizedPoolIds = poolIds;
   }
 
   protected getCandidateRoutes(
@@ -134,7 +153,7 @@ export class OptimizedRoutes {
     computeRoutes(tokenInDenom, tokenOutDenom, [], [], poolsUsed);
     this.candidatePathsCache.set(cacheKey, routes);
 
-    return routes.filter(({ pools }) => pools.length < maxHops);
+    return routes.filter(({ pools }) => pools.length <= maxHops);
   }
 
   getOptimizedRoutesByTokenIn(
@@ -216,8 +235,6 @@ export class OptimizedRoutes {
       throw new NotEnoughLiquidityError();
     }
 
-    // TODO: ...
-
     return initialSwapAmounts.map((amount, i) => {
       return {
         ...routes[i],
@@ -226,19 +243,9 @@ export class OptimizedRoutes {
     });
   }
 
-  calculateTokenOutByTokenIn(routes: RouteWithAmount[]): {
-    amount: Int;
-    beforeSpotPriceInOverOut: Dec;
-    beforeSpotPriceOutOverIn: Dec;
-    afterSpotPriceInOverOut: Dec;
-    afterSpotPriceOutOverIn: Dec;
-    effectivePriceInOverOut: Dec;
-    effectivePriceOutOverIn: Dec;
-    tokenInFeeAmount: Int;
-    swapFee: Dec;
-    multiHopOsmoDiscount: boolean;
-    priceImpact: Dec;
-  } {
+  calculateTokenOutByTokenIn(
+    routes: RouteWithAmount[]
+  ): TokenOutByTokenInResult {
     if (routes.length === 0) {
       throw new Error("Paths are empty");
     }
