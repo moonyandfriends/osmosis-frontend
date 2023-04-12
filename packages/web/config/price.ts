@@ -1449,7 +1449,7 @@ export const PoolPriceRoutes: IntermediateRoute[] = [
   },
   {
     alternativeCoinId: "pool:shibac",
-    poolId: "962",
+    poolId: "968",
     spotPriceSourceDenom: DenomHelper.ibcDenom(
       [{ portId: "transfer", channelId: "channel-169" }],
       "cw20:juno1x5qt47rw84c4k6xvvywtrd40p8gxjt8wnmlahlqg07qevah3f8lqwxfs7z"
